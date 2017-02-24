@@ -5,45 +5,37 @@ package ru.spbau.mit;
  */
 public class TrieImpl implements Trie {
     public static final int ALPHABET_SIZE = 26;
-    private Node root;
-    public TrieImpl() {
-        root = new Node();
-    }
+    private final Node root = new Node();
 
     public boolean add(String element) {
         Node currentNode = root;
-        boolean result = contains(element);
-        if (result) {
+        if (contains(element)) {
             return false;
         }
         for (int i = 0; i < element.length(); i++) {
-            currentNode.setNumberOfSubtreeT(currentNode.getNumberOfSubtreeT() + 1);
+            currentNode.increaseNumberOfSubtreeTerminals();
             int index =  charToIndex(element.charAt(i));
-            if (currentNode.hasEdge(index)) {
-                currentNode = currentNode.nodeAt(index);
-            } else {
+            if (!currentNode.hasEdge(index)) {
                 currentNode.createEdge(index);
-                currentNode = currentNode.nodeAt(index);
             }
+            currentNode = currentNode.nodeAt(index);
         }
-        currentNode.setNumberOfSubtreeT(currentNode.getNumberOfSubtreeT() + 1);
+        currentNode.increaseNumberOfSubtreeTerminals();
         currentNode.setTerminality(true);
         return true;
     }
 
     public boolean contains(String element) {
         Node currentNode = root;
-        boolean result = true;
         for (int i = 0; i < element.length(); i++) {
             int index = charToIndex(element.charAt(i));
             if (!currentNode.hasEdge(index)) {
-                result = false;
-                break;
+                return false;
             } else {
                 currentNode = currentNode.nodeAt(index);
             }
         }
-        return result && currentNode.getTerminality();
+        return currentNode.getTerminality();
     }
 
 
@@ -52,18 +44,21 @@ public class TrieImpl implements Trie {
             return false;
         }
         Node previousNode = root;
-        Node currentNode = root.nodeAt(charToIndex(element.charAt(0)));
-        for (int i = 1; i < element.length(); i++) {
-            int index = charToIndex(element.charAt(i));
-            previousNode.setNumberOfSubtreeT(previousNode.getNumberOfSubtreeT() - 1);
+        int i = 0;
+        Node currentNode = root.nodeAt(charToIndex(element.charAt(i)));
+        int index = charToIndex(element.charAt(i));
+        do {
+            i++;
+            previousNode.decreaseNumberOfSubtreeTerminals();
             if (previousNode.getNumberOfSubtreeT() == 0) {
                 previousNode.removeEdge(index);
                 return true;
             }
+            index = charToIndex(element.charAt(i));
             previousNode = currentNode;
             currentNode = currentNode.nodeAt(index);
-        }
-        currentNode.setNumberOfSubtreeT(currentNode.getNumberOfSubtreeT() - 1);
+        } while (i < element.length() - 1);
+        currentNode.decreaseNumberOfSubtreeTerminals();
         currentNode.setTerminality(false);
         return true;
     }
@@ -83,7 +78,7 @@ public class TrieImpl implements Trie {
         return currentNode.getNumberOfSubtreeT();
     }
 
-    public static int charToIndex(char c) {
+    private static int charToIndex(char c) {
         if (c >= 'a' && c <= 'z') {
             return c - 'a';
         }

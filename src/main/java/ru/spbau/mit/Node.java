@@ -30,11 +30,14 @@ public class Node {
     public boolean getTerminality() {
         return isTerminal;
     }
-    public void setNumberOfSubtreeT(int number) {
-        numberOfSubtreeTerminals = number;
-    }
     public int getNumberOfSubtreeT() {
         return numberOfSubtreeTerminals;
+    }
+    public void increaseNumberOfSubtreeTerminals() {
+        numberOfSubtreeTerminals++;
+    }
+    public void decreaseNumberOfSubtreeTerminals() {
+        numberOfSubtreeTerminals--;
     }
 
 }

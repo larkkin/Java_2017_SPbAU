@@ -74,6 +74,16 @@ public class TrieTest {
         assertTrue(trie.contains("apELs"));
     }
 
+    @Test
+    public void testAbc() {
+        final Trie instance = instance();
+
+        assertTrue(instance.add("a"));
+        assertEquals(1, instance.howManyStartsWithPrefix(""));
+        assertTrue(instance.remove("a"));
+        assertEquals(0, instance.howManyStartsWithPrefix(""));
+    }
+
     public static Trie instance() {
         try {
             return (Trie) Class.forName("ru.spbau.mit.TrieImpl").newInstance();
