@@ -1,11 +1,28 @@
 package ru.spbau.mit;
 
+import java.io.DataInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.DataOutputStream;
+
+
 /**
  * Created by lara on 18.02.17.
  */
-public class TrieImpl implements Trie {
+public class TrieImpl implements Trie, StreamSerializable {
     public static final int ALPHABET_SIZE = 26;
     private final Node root = new Node();
+
+    public void serialize(OutputStream out) throws SerializationException {
+        DataOutputStream dos = new DataOutputStream(out);
+        root.serializeNode(dos);
+    }
+
+    public void deserialize(InputStream in) throws SerializationException {
+        DataInputStream dis = new DataInputStream(in);
+        root.deserializeNode(dis);
+    }
+
 
     public boolean add(String element) {
         Node currentNode = root;

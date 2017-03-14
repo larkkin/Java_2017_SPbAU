@@ -2,6 +2,7 @@ package ru.spbau.mit;
 
 import org.junit.Test;
 
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -75,7 +76,7 @@ public class TrieTest {
     }
 
     @Test
-    public void testAbc() {
+    public void testEmptyLine() {
         final Trie instance = instance();
 
         assertTrue(instance.add("a"));
@@ -83,6 +84,8 @@ public class TrieTest {
         assertTrue(instance.remove("a"));
         assertEquals(0, instance.howManyStartsWithPrefix(""));
     }
+
+
 
     public static Trie instance() {
         try {
