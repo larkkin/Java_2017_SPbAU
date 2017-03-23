@@ -15,7 +15,7 @@ public class DictionaryTest {
     }
     @Test
     public void testMultiplePutRemove() {
-        final int numberOfPairsToPut = 300;
+        final int numberOfPairsToPut = 3000;
         Dictionary dict = instance();
         assertEquals(0, dict.size());
         for (int i = 0; i < numberOfPairsToPut; i++) {
@@ -35,7 +35,7 @@ public class DictionaryTest {
 
     @Test
     public void testMultipleGet() {
-        final int numberOfPairsToPut = 300;
+        final int numberOfPairsToPut = 3000;
         Dictionary dict = instance();
         String[] keys = new String[numberOfPairsToPut];
         String[] values = new String[numberOfPairsToPut];
