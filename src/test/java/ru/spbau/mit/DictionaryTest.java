@@ -75,6 +75,39 @@ public class DictionaryTest {
         assertNull(dict.remove("abc"));
         assertFalse(dict.contains("abc"));
     }
+    @Test
+    public void testRehash() {
+        Dictionary dict = instance();
+        final int maxNum = 32;
+        final int defautTableLength = 16;
+        final double maxLoadfactor = 0.75;
+        final double minLoadfactor = 0.1;
+
+        assertEquals(1 << DictionaryImpl.DEFAULT_EXPONENT, ((DictionaryImpl) dict).tableLength());
+        for (int i = 0; i < maxNum + 1; i++) {
+            assertFalse(dict.contains(Integer.toString(i * i)));
+            dict.put(Integer.toString(i * i), "hey");
+            assertEquals(i + 1, dict.size());
+            assertTrue(dict.contains(Integer.toString(i * i)));
+            if (i < defautTableLength * maxLoadfactor) {
+                assertEquals(defautTableLength, ((DictionaryImpl) dict).tableLength());
+            } else if (i < defautTableLength * 2 * maxLoadfactor) {
+                assertEquals(defautTableLength * 2, ((DictionaryImpl) dict).tableLength());
+            } else {
+                assertEquals(defautTableLength * 2 * 2, ((DictionaryImpl) dict).tableLength());
+            }
+        }
+        for (int i = maxNum; i > 0; i--) {
+            assertTrue(dict.contains(Integer.toString(i * i)));
+            dict.remove(Integer.toString(i * i));
+            assertFalse(dict.contains(Integer.toString(i * i)));
+            assertEquals(i, dict.size());
+            if (i < defautTableLength * 2 * 2 * minLoadfactor && i > defautTableLength * 2 * minLoadfactor) {
+                assertEquals(defautTableLength * 2, ((DictionaryImpl) dict).tableLength());
+            }
+        }
+        System.out.println(((DictionaryImpl) dict).tableLength());
+    }
 
 
     private static Dictionary instance() {

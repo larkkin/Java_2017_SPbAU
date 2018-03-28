@@ -4,28 +4,42 @@ import java.util.Random;
  * Created by lara on 03.03.17.
  */
 public class DictionaryImpl implements Dictionary {
-    private static final int DEFAULT_EXPONENT = 9;
+    static final int DEFAULT_EXPONENT = 4;
+    private static final int MIN_LENGTH_TO_REHASH = 8;
+    private static final double DEFAULT_MAX_LOADFACTOR = 0.75;
+    private static final double DEFAULT_MIN_LOADFACTOR = 0.1;
 
     private StringPairListNode[] hashTable;
+    private final double maxLoadfactor;
+    private final double minLoadfactor;
     private int a;
     private int b;
     private int size;
 
 
-    public DictionaryImpl(int exponent) {
+    public DictionaryImpl(int exponent, double maxLoadfactor) {
         int tableLength = 1 << exponent;
         hashTable = new StringPairListNode[tableLength];
         generateCoeffs();
+        this.maxLoadfactor = maxLoadfactor;
+        minLoadfactor = Math.min(this.maxLoadfactor / 2, DEFAULT_MIN_LOADFACTOR);
         size = 0;
     }
 
     public DictionaryImpl() {
-        this(DEFAULT_EXPONENT);
+        this(DEFAULT_EXPONENT, DEFAULT_MAX_LOADFACTOR);
     }
-
 
     public int size() {
         return size;
+    }
+
+    public int tableLength() {
+        return hashTable.length;
+    }
+
+    public double loadFactor() {
+        return ((double) size()) / tableLength();
     }
 
     public boolean contains(String key) {
@@ -52,13 +66,13 @@ public class DictionaryImpl implements Dictionary {
                 oldListHead.setPrev(newNode);
             }
             size++;
+            if (loadFactor() > maxLoadfactor) {
+                rehashUp();
+            }
             return null;
         }
         String oldValue = node.getValue();
         node.setValue(value);
-        if (size() > hashTable.length) {
-            rehash();
-        }
         return oldValue;
     }
 
@@ -78,6 +92,10 @@ public class DictionaryImpl implements Dictionary {
             next.setPrev(prev);
         }
         size--;
+
+        if (loadFactor() < minLoadfactor) {
+            rehashDown();
+        }
         return node.getValue();
     }
 
@@ -108,14 +126,25 @@ public class DictionaryImpl implements Dictionary {
         b = randomGenerator.nextInt(tableLength / 2) * 2 + 1;
     }
 
-    private void rehash() {
-        int tableLength = hashTable.length * 2;
+    private void rehashUp() {
+        rehash(hashTable.length * 2);
+    }
+    private void rehashDown() {
+        if (hashTable.length < MIN_LENGTH_TO_REHASH) {
+            return;
+        }
+        rehash(hashTable.length / 2);
+    }
+    private void rehash(int tableLength) {
+        size = 0;
         StringPairListNode[] oldHashTable = hashTable;
         hashTable = new StringPairListNode[tableLength];
         generateCoeffs();
         for (StringPairListNode node : oldHashTable) {
-            while (node != null) {
-                put(node.getKey(), node.getValue());
+            StringPairListNode currentNode = node;
+            while (currentNode != null) {
+                put(currentNode.getKey(), currentNode.getValue());
+                currentNode = currentNode.getNext();
             }
         }
     }
